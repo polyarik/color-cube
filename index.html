@@ -1,0 +1,88 @@
+<!doctype html>
+
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="apple-mobile-web-app-capable" content="yes"/>
+		<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+
+		<title>Color Cube</title>
+
+		<link href="favicon.ico" type="image/x-icon"> 
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" type="text/css" href="css/switch.css">
+		<link rel="stylesheet" type="text/css" href="css/buttons.css">
+	</head>
+
+	<body onload="main();">
+		<script type="text/javascript" src="js/main.js"></script>
+		<script type="text/javascript" src="js/render.js"></script>
+		<script type="text/javascript" src="lib/jquery.js"></script>
+
+		<div id="content">
+			<div id="buttons">
+				<input id="menu-checkbox" type="checkbox" tabindex="-1">
+
+				<div id="switch-wrapper">
+					<div id="menu-colors-icon"></div>
+
+					<label for="menu-checkbox" id="switch">
+                        <span id="slider"></span>
+                    </label>
+
+					<div id="menu-flashing-icon"></div>
+				</div>
+
+				<div id="buttons-colors">
+					<div class="button-row">
+						<button class="button button-red" id="r-50">-50</button>
+						<button class="button button-red" id="r-10">-10</button>
+						<button class="button button-red" id="r-1">-1</button>
+						
+						<button class="color" id="color-red">127</button>
+						
+						<button class="button button-red" id="r+1">+1</button>
+						<button class="button button-red" id="r+10">+10</button>
+						<button class="button button-red" id="r+50">+50</button>
+					</div>
+
+					<div class="button-row">
+						<button class="button button-green" id="g-50">-50</button>
+						<button class="button button-green" id="g-10">-10</button>
+						<button class="button button-green" id="g-1">-1</button>
+						
+						<button class="color" id="color-green">127</button>
+
+						<button class="button button-green" id="g+1">+1</button>
+						<button class="button button-green" id="g+10">+10</button>
+						<button class="button button-green" id="g+50">+50</button>	
+					</div>
+
+					<div class="button-row">
+						<button class="button button-blue" id="b-50">-50</button>
+						<button class="button button-blue" id="b-10">-10</button>
+						<button class="button button-blue" id="b-1">-1</button>
+
+						<button class="color" id="color-blue">127</button>
+
+						<button class="button button-blue" id="b+1">+1</button>
+						<button class="button button-blue" id="b+10">+10</button>
+						<button class="button button-blue" id="b+50">+50</button>
+					</div>
+				</div>
+
+				<div id="buttons-modes">
+					<button class="button-mode" id="mode-algorithm">PolYarik's Algorithm</button>
+					<button class="button-mode" id="mode-random">Random</button>
+				</div>
+			</div>
+
+			<div id="canvas-wrapper">
+				<canvas id="canvas"></canvas>
+			</div>
+		</div>
+	</body>
+</html>
