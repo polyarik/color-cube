@@ -1,5 +1,8 @@
 var ww, wh;
 var canvas, ctx;
+var canvasWrapper;
+
+var menuCheckbox;
 
 var color = {
 	"r": 127,
@@ -7,33 +10,34 @@ var color = {
 	"b": 127
 };
 
+var colorInfo;
+
 var darkening = [0, 15, -6]; // top, left, right; in %
 
 var interval;
 var mode = "stop";
 
-var switched = false;
 
-
-function main() {
-	canvas = document.getElementById("canvas");
+function init() {
+	canvas = document.querySelector("#canvas");
 	ctx = canvas.getContext("2d");
 
-	resize();
+	canvasWrapper = document.querySelector("#canvas-wrapper");
+	menuCheckbox = document.querySelector("#menu-checkbox");
 
-	$(window).resize(function() {
-		resize();
-	});
-	
+	colorInfo = {
+		"r": document.querySelector("#color-red"),
+		"g": document.querySelector("#color-green"),
+		"b": document.querySelector("#color-blue")
+	};
+
+	resize();
 	clickEvents();
 }
 
 function resize() {
-	ww = $(window).width();
-	wh = $(window).height();
-
-	var wrapperWidth = +$("#canvas-wrapper").css("width").replace("px", "");
-	var wrapperHeight = +$("#canvas-wrapper").css("height").replace("px", "");
+	const wrapperWidth = canvasWrapper.clientWidth;
+	const wrapperHeight = canvasWrapper.clientHeight;
 
 	canvas.width = Math.min(wrapperWidth, wrapperHeight);
 	canvas.height = Math.min(wrapperWidth, wrapperHeight);
@@ -42,117 +46,99 @@ function resize() {
 	drawCube(canvas.width/2, canvas.height, canvas.width/2, canvas.height/2, canvas.height/2, color);
 }
 
-function clickEvents() {
-	$(".button").click(function() {
-		clearInterval(interval);
+function changeColor(component, change) {
+	clearInterval(interval);
+	mode = "stop";
+
+	color[component] += change;
+
+	if (color[component] > 255) color[component] = 255;
+	if (color[component] < 0) color[component] = 0;
+
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	drawCube(canvas.width/2, canvas.height, canvas.width/2, canvas.height/2, canvas.height/2, color);
+
+	updateColorInfo(component);
+}
+
+function runColorChangingRandom(delay = 300) {
+	clearInterval(interval);
+
+	if (mode != "random") {
+		mode = "random";
+
+		interval = window.setInterval(function() {
+			for (let component in color) {
+				color[component] = getRandomInt(0, 255);
+			}
+			
+			if (!menuCheckbox.checked)
+				updateColorInfo();
+
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			drawCube(canvas.width/2, canvas.height, canvas.width/2, canvas.height/2, canvas.height/2, color);
+		}, delay);
+	} else
 		mode = "stop";
+}
 
-		const component = this.id[0];
-		const action = +this.id.substring(1);
+function runColorChangingAlgorithm(step = 10, delay = 5) {
+	clearInterval(interval);
 
-		color[component] += action;
+	if (mode != "algorithm") {
+		mode = "algorithm";
 
-		if (color[component] > 255) color[component] = 255;
-		if (color[component] < 0) color[component] = 0;
+		const components = ["b", "g", "r"];
+		let coeffs = [1, 1, 1];
+		let component = 0;
 
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		drawCube(canvas.width/2, canvas.height, canvas.width/2, canvas.height/2, canvas.height/2, color);
+		interval = window.setInterval(function() {
+			const curComp = components[component];
+			color[curComp] += step * coeffs[component];
 
-		updateColorInfo(component);
-	});
+			if (color[curComp] > 255 || color[curComp] < 0) {
+				coeffs[component] *= -1;
+				component = (component == 2) ? 0 : (component + 1);
 
-	$("#mode-algorithm").click(function() {
-		clearInterval(interval);
+				color[curComp] = color[curComp] > 0 ? 255 : 0;
+			} else
+				component = 0;
+			
+			if (!menuCheckbox.checked)
+				updateColorInfo(component);
 
-		if (mode != "algorithm") {
-			mode = "algorithm";
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			drawCube(canvas.width/2, canvas.height, canvas.width/2, canvas.height/2, canvas.height/2, color);
+		}, delay);
+	} else
+		mode = "stop";
+}
 
-			const components = ["b", "g", "r"];
-			let coeffs = [1, 1, 1];
-			let component = 0;
-
-			let step = 10;
-			let delay = 5;
-
-			interval = window.setInterval(function() {
-				const curComp = components[component];
-				color[curComp] += step * coeffs[component];
-
-				if (color[curComp] > 255 || color[curComp] < 0) {
-					coeffs[component] *= -1;
-					component = (component == 2) ? 0 : (component + 1);
-
-					color[curComp] = color[curComp] > 0 ? 255 : 0;
-				} else
-					component = 0;
-				
-				if (!switched)
-					updateColorInfo(component);
-
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-				drawCube(canvas.width/2, canvas.height, canvas.width/2, canvas.height/2, canvas.height/2, color);
-			}, delay);
-		} else
-			mode = "stop";
-	});
-
-	$("#mode-random").click(function() {
-		clearInterval(interval);
-
-		if (mode != "random") {
-			mode = "random";
-
-			let delay = 300;
-
-			interval = window.setInterval(function() {
-				for (let component in color) {
-					color[component] = getRandomInt(0, 255);
-				}
-				
-				if (!switched)
-					updateColorInfo();
-
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-				drawCube(canvas.width/2, canvas.height, canvas.width/2, canvas.height/2, canvas.height/2, color);
-			}, delay);
-		} else
-			mode = "stop";
-	});
-
-	$("#switch").click(function() {
-		if (switched)
-			updateColorInfo();
-
-		switched = !switched;
-	});
-
-	$("#menu-colors-icon").click(function() {
+function clickEvents() {
+	document.querySelector("#menu-colors-icon").onclick = () => {
 		updateColorInfo();
+		menuCheckbox.checked = false;
+	};
 
-		switched = false;
-		$("#menu-checkbox").prop("checked", switched);
-	});
-
-	$("#menu-flashing-icon").click(function() {
-		switched = true;
-		$("#menu-checkbox").prop("checked", switched);
-	});
+	document.querySelector("#menu-flashing-icon").onclick = () => {
+		menuCheckbox.checked = true;
+	};
 }
 
 function updateColorInfo(component) {
 	if (component == "r" || !component) {
-		$("#color-red").css("background-color", `rgb(${color["r"]}, 0, 0)`);
-		$("#color-red").text(color["r"]);
+		colorInfo["r"].style.backgroundColor = `rgb(${color["r"]}, 0, 0)`;
+		colorInfo["r"].innerText = color["r"];
 	}
 	
 	if (component == "g" || !component) {
-		$("#color-green").css("background-color", `rgb(0, ${color["g"]}, 0)`);
-		$("#color-green").text(color["g"]);
+		colorInfo["g"].style.backgroundColor = `rgb(0, ${color["g"]}, 0)`;
+		colorInfo["g"].innerText = color["g"];
 	}
 	
 	if (component == "b" || !component) {
-		$("#color-blue").css("background-color", `rgb(0, 0, ${color["b"]})`);
-		$("#color-blue").text(color["b"]);
+		colorInfo["b"].style.backgroundColor = `rgb(0, 0, ${color["b"]})`;
+		colorInfo["b"].innerText = color["b"];
 	}
 }
 

@@ -16,7 +16,7 @@
     height: 10vh;
     max-height: 64px;
 
-	background-image: url("images/color_cube.png");
+	background-image: url("../images/color_cube.png");
 	background-repeat: no-repeat;
 	background-size: contain;
 }
@@ -28,7 +28,7 @@
     height: 10vh;
     max-height: 64px;
 
-	background-image: url("images/flashing_cube.png");
+	background-image: url("../images/flashing_cube.png");
 	background-repeat: no-repeat;
 	background-size: contain;
 	
