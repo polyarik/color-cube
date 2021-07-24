@@ -1,4 +1,3 @@
-var ww, wh;
 var canvas, ctx;
 var canvasWrapper;
 
