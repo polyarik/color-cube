@@ -35,11 +35,14 @@ function init() {
 }
 
 function resize() {
-	const wrapperWidth = canvasWrapper.clientWidth;
-	const wrapperHeight = canvasWrapper.clientHeight;
+	const size = Math.min(canvasWrapper.clientWidth, canvasWrapper.clientHeight);
+	const scale = window.devicePixelRatio;
 
-	canvas.width = Math.min(wrapperWidth, wrapperHeight);
-	canvas.height = Math.min(wrapperWidth, wrapperHeight);
+	canvas.style.width = size + "px";
+	canvas.style.height = size + "px";
+
+	canvas.width = Math.floor(size * scale);
+	canvas.height = Math.floor(size * scale);
 
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	drawCube(canvas.width/2, canvas.height, canvas.width/2, canvas.height/2, canvas.height/2, color);
